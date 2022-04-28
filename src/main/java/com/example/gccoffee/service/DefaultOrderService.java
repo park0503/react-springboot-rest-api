@@ -7,7 +7,6 @@ import com.example.gccoffee.domain.OrderStatus;
 import com.example.gccoffee.repository.OrderRepository;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
@@ -22,7 +21,7 @@ public class DefaultOrderService implements OrderService{
 
     @Override
     public Order createOrder(Email email, String address, String postcode, List<OrderItem> orderItems) {
-        Order order = new Order(UUID.randomUUID(), email, address, postcode, orderItems, OrderStatus.ACCEPTED, LocalDateTime.now().withNano(0), LocalDateTime.now().withNano(0));
+        Order order = new Order(UUID.randomUUID(), email, address, postcode, orderItems, OrderStatus.ACCEPTED);
         return orderRepository.insert(order);
     }
 }

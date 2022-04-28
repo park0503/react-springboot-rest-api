@@ -23,16 +23,16 @@ public class OrderJdbcRepository implements OrderRepository{
     @Override
     @Transactional
     public Order insert(Order order) {
-        jdbcTemplate.update("insert into orders(order_id, email, address, postcode, order_status, created_at, updated_at) values(UNHEX(REPLACE(:orderId, '-', '')), :email, :address, :postcode, :orderStatus, :creatdAt, :updatedAt)", toOrderParamMap(order));
+        jdbcTemplate.update("insert into orders(order_id, email, address, postcode, order_status, created_at, updated_at) values(UNHEX(REPLACE(:orderId, '-', '')), :email, :address, :postcode, :orderStatus, :createdAt, :updatedAt)", toOrderParamMap(order));
         order.getOrderItems().forEach(item ->
-                jdbcTemplate.update("insert into order_items(order_id, product_id, category, price, quantity, createdAt, updatedAt) values(UNHEX(REPLACE(:orderId, '-', '')), UNHEX(REPLACE(:productId, '-', '')), :category, :price, :quantity, :createdAt, :updatedAt)", toOrderItemParamMap(order.getOrderId(), order.getCreatedAt(), order.getUpdatedAt(), item)));
+                jdbcTemplate.update("insert into order_items(order_id, product_id, category, price, quantity, created_at, updated_at) values(UNHEX(REPLACE(:orderId, '-', '')), UNHEX(REPLACE(:productId, '-', '')), :category, :price, :quantity, :createdAt, :updatedAt)", toOrderItemParamMap(order.getOrderId(), order.getCreatedAt(), order.getUpdatedAt(), item)));
         return order;
     }
 
     private Map<String, Object> toOrderParamMap(Order order) {
         var paramMap = new HashMap<String, Object>();
         paramMap.put("orderId", order.getOrderId().toString().getBytes());
-        paramMap.put("email", order.getEmail());
+        paramMap.put("email", order.getEmail().getAddress());
         paramMap.put("address", order.getAddress());
         paramMap.put("postcode", order.getPostcode());
         paramMap.put("orderStatus", order.getOrderStatus().toString());
@@ -43,7 +43,7 @@ public class OrderJdbcRepository implements OrderRepository{
 
     private Map<String, Object> toOrderItemParamMap(UUID orderId, LocalDateTime createdAt, LocalDateTime updatedAt, OrderItem item) {
         var paramMap = new HashMap<String, Object>();
-        paramMap.put("orderId", item.getOrderId().toString().getBytes());
+        paramMap.put("orderId", orderId.toString().getBytes());
         paramMap.put("productId", item.getProductId().toString().getBytes());
         paramMap.put("category", item.getCategory().toString());
         paramMap.put("price", item.getPrice());
